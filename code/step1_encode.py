@@ -112,7 +112,11 @@ def encode_and_save(df, dataset_name, cat_features, num_features, proj_dim=128):
 
     # ── Numerical ────────────────────────────────────────────────
     avail_num = [f for f in num_features if f in df.columns]
-    X_num = RobustScaler().fit_transform(df[avail_num].fillna(-999))
+    if avail_num:
+        X_num = RobustScaler().fit_transform(df[avail_num].fillna(-999))
+    else:
+        # Keep shape consistent when a dataset has no configured numeric features.
+        X_num = np.empty((len(df), 0), dtype=np.float32)
     np.save(CACHE_DIR / f"{dataset_name}_X_num.npy",  X_num)
     np.save(CACHE_DIR / f"{dataset_name}_y.npy",      y)
     print(f"Numerical features: {X_num.shape}")
@@ -176,7 +180,10 @@ if __name__ == "__main__":
 
     if args.dataset == "synth":
         df = make_synthetic()
-        cat_feats, num_feats = VEHICLE_CAT, VEHICLE_NUM
+        # Infer features from synthetic dataframe to keep smoke test stable.
+        feature_cols = [c for c in df.columns if c != "isFraud"]
+        num_feats = [c for c in feature_cols if pd.api.types.is_numeric_dtype(df[c])]
+        cat_feats = [c for c in feature_cols if c not in num_feats]
     elif args.dataset == "vehicle":
         df, cat_feats, num_feats = load_vehicle()
     else:

@@ -4,6 +4,13 @@
 # Author: Juharasha Shaik (shaik.juharasha@ieee.org)
 # ─────────────────────────────────────────────────────────────────────────────
 
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+VEHICLE_DIR="$ROOT_DIR/data/vehicle"
+CLAIMS_DIR="$ROOT_DIR/data/claims"
+
 echo "=== FraudBERT Dataset Setup ==="
 
 # Step 1: Get Kaggle API credentials
@@ -13,18 +20,24 @@ mkdir -p ~/.kaggle
 # cp /path/to/your/kaggle.json ~/.kaggle/kaggle.json
 chmod 600 ~/.kaggle/kaggle.json 2>/dev/null
 
+if ! command -v kaggle >/dev/null 2>&1; then
+  echo "Error: kaggle CLI not found in PATH."
+  echo "Install it with: pip install kaggle  (or use your virtualenv pip)"
+  exit 1
+fi
+
 # Step 2: Download Vehicle Insurance Fraud dataset
 echo "Downloading Vehicle Claim Fraud Detection Dataset..."
-mkdir -p ../data/vehicle
-kaggle datasets download -d shivamb/vehicle-claim-fraud-detection -p ../data/vehicle
-cd ../data/vehicle && unzip -q vehicle-claim-fraud-detection.zip && cd -
+mkdir -p "$VEHICLE_DIR"
+kaggle datasets download -d shivamb/vehicle-claim-fraud-detection -p "$VEHICLE_DIR"
+unzip -o -q "$VEHICLE_DIR/vehicle-claim-fraud-detection.zip" -d "$VEHICLE_DIR"
 echo "Vehicle dataset ready at data/vehicle/"
 
 # Step 3: Download Insurance Claims Fraud dataset
 echo "Downloading Insurance Claims Fraud Dataset..."
-mkdir -p ../data/claims
-kaggle datasets download -d mastmustu/insurance-claims-fraud-data -p ../data/claims
-cd ../data/claims && unzip -q insurance-claims-fraud-data.zip && cd -
+mkdir -p "$CLAIMS_DIR"
+kaggle datasets download -d mastmustu/insurance-claims-fraud-data -p "$CLAIMS_DIR"
+unzip -o -q "$CLAIMS_DIR/insurance-claims-fraud-data.zip" -d "$CLAIMS_DIR"
 echo "Claims dataset ready at data/claims/"
 
 echo ""
