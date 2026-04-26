@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+env/
+venv/
+
+# Data — Kaggle datasets (download locally via setup_and_download.sh)
+data/vehicle/
+data/claims/
+
+# Pre-computed embeddings (large binary files, regenerate with step1_encode.py)
+data/embeddings/*.npy
+
+# Keep the embeddings directory itself
+!data/embeddings/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp

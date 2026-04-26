@@ -1,0 +1,44 @@
+[
+  {
+    "model": "Logistic Regression (baseline)",
+    "AUPRC": "0.0343\u00b10.0008",
+    "AUC": "0.4813\u00b10.0178",
+    "F1": "0.0517\u00b10.0075",
+    "_auprc_mean": 0.034320234180167906
+  },
+  {
+    "model": "Random Forest (baseline)",
+    "AUPRC": "0.0393\u00b10.0073",
+    "AUC": "0.5103\u00b10.0314",
+    "F1": "0.0000\u00b10.0000",
+    "_auprc_mean": 0.039297204905341214
+  },
+  {
+    "model": "XGBoost (baseline)",
+    "AUPRC": "0.0366\u00b10.0033",
+    "AUC": "0.5163\u00b10.0209",
+    "F1": "0.0206\u00b10.0172",
+    "_auprc_mean": 0.03658672354339324
+  },
+  {
+    "model": "LightGBM (baseline)",
+    "AUPRC": "0.0361\u00b10.0026",
+    "AUC": "0.4976\u00b10.0189",
+    "F1": "0.0000\u00b10.0000",
+    "_auprc_mean": 0.03609244991778892
+  },
+  {
+    "model": "FraudBERT + XGBoost (ours)",
+    "AUPRC": "0.0383\u00b10.0027",
+    "AUC": "0.5214\u00b10.0120",
+    "F1": "0.0000\u00b10.0000",
+    "_auprc_mean": 0.03830392393513423
+  },
+  {
+    "model": "FraudBERT + LightGBM (ours)",
+    "AUPRC": "0.0346\u00b10.0024",
+    "AUC": "0.4852\u00b10.0172",
+    "F1": "0.0000\u00b10.0000",
+    "_auprc_mean": 0.03456090001892228
+  }
+]
