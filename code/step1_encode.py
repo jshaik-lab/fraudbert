@@ -30,27 +30,27 @@ VEHICLE_CAT = [
     "Days_Policy_Claim", "PastNumberOfClaims", "AgeOfVehicle",
     "AgeOfPolicyHolder", "PoliceReportFiled", "WitnessPresent",
     "AgentType", "NumberOfSuppliments", "AddressChange_Claim",
-    "NumberOfCars", "BasePolicy"
+    "NumberOfCars", "BasePolicy",
+    # Temporal string features — LLM encoding captures semantic order
+    "Month", "DayOfWeek", "DayOfWeekClaimed", "MonthClaimed"
 ]
 VEHICLE_NUM = [
-    "Month", "WeekOfMonth", "DayOfWeek", "DayOfWeekClaimed",
-    "MonthClaimed", "WeekOfMonthClaimed", "Age", "Deductible",
+    "WeekOfMonth", "WeekOfMonthClaimed", "Age", "Deductible",
     "DriverRating", "Year", "RepNumber"
 ]
 
 # ── Insurance Claims Fraud Dataset (Kaggle: mastmustu/insurance-claims-fraud-data)
+# Actual columns from insurance_data.csv (CLAIM_STATUS D=fraud, A=legitimate)
 CLAIMS_CAT = [
-    "policy_csl", "insured_sex", "insured_education_level", "insured_occupation",
-    "insured_hobbies", "insured_relationship", "incident_type", "collision_type",
-    "incident_severity", "authorities_contacted", "incident_state", "incident_city",
-    "property_damage", "bodily_injuries", "witnesses",
-    "police_report_available", "auto_make", "auto_model"
+    "INSURANCE_TYPE", "MARITAL_STATUS", "EMPLOYMENT_STATUS",
+    "RISK_SEGMENTATION", "HOUSE_TYPE", "SOCIAL_CLASS",
+    "CUSTOMER_EDUCATION_LEVEL", "INCIDENT_SEVERITY",
+    "AUTHORITY_CONTACTED", "ANY_INJURY", "POLICE_REPORT_AVAILABLE",
+    "INCIDENT_STATE", "INCIDENT_CITY"
 ]
 CLAIMS_NUM = [
-    "months_as_customer", "age", "policy_deductable", "policy_annual_premium",
-    "umbrella_limit", "capital-gains", "capital-loss", "incident_hour_of_the_day",
-    "number_of_vehicles_involved", "injury_claim", "property_claim",
-    "vehicle_claim", "total_claim_amount"
+    "PREMIUM_AMOUNT", "CLAIM_AMOUNT", "AGE", "TENURE",
+    "NO_OF_FAMILY_MEMBERS", "INCIDENT_HOUR_OF_THE_DAY"
 ]
 
 # Default to vehicle insurance dataset
@@ -100,25 +100,25 @@ def load_vehicle():
 
 def load_claims():
     """Insurance Claims Fraud — Kaggle: mastmustu/insurance-claims-fraud-data"""
-    df = pd.read_csv(DATA_DIR / "claims" / "insurance_claims.csv")
-    df["isFraud"] = (df["fraud_reported"] == "Y").astype(int)
+    df = pd.read_csv(DATA_DIR / "claims" / "insurance_data.csv")
+    df["isFraud"] = (df["CLAIM_STATUS"] == "D").astype(int)
     print(f"Loaded Insurance Claims: {len(df):,} rows | fraud={df['isFraud'].mean():.3%}")
     return df, CLAIMS_CAT, CLAIMS_NUM
 
 
-def encode_and_save(df, dataset_name, proj_dim=128):
+def encode_and_save(df, dataset_name, cat_features, num_features, proj_dim=128):
     TARGET = "isFraud"
     y = df[TARGET].values
 
     # ── Numerical ────────────────────────────────────────────────
-    avail_num = [f for f in NUM_FEATURES if f in df.columns]
+    avail_num = [f for f in num_features if f in df.columns]
     X_num = RobustScaler().fit_transform(df[avail_num].fillna(-999))
     np.save(CACHE_DIR / f"{dataset_name}_X_num.npy",  X_num)
     np.save(CACHE_DIR / f"{dataset_name}_y.npy",      y)
     print(f"Numerical features: {X_num.shape}")
 
     # ── LLM Categorical ──────────────────────────────────────────
-    avail_cat = [f for f in CAT_FEATURES if f in df.columns]
+    avail_cat = [f for f in cat_features if f in df.columns]
     if not avail_cat:
         X_fused = X_num
         np.save(CACHE_DIR / f"{dataset_name}_X_fused.npy", X_fused)
@@ -182,4 +182,4 @@ if __name__ == "__main__":
     else:
         df, cat_feats, num_feats = load_claims()
 
-    encode_and_save(df, args.dataset, proj_dim=args.proj_dim)
+    encode_and_save(df, args.dataset, cat_feats, num_feats, proj_dim=args.proj_dim)
